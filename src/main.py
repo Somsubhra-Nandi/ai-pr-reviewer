@@ -1,0 +1,51 @@
+import os
+import hmac
+import hashlib
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
+from src.orchestrator import process_pr_event
+
+app = FastAPI(title="AI PR Reviewer", version="1.0.0")
+
+# Load Secrets
+WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET")
+
+def validate_signature(payload: bytes, signature: str) -> bool:
+    if not WEBHOOK_SECRET:
+        # If .env is empty, this prints a warning instead of crashing
+        print("WARNING: GITHUB_WEBHOOK_SECRET is missing!")
+        return False
+        
+    if not signature:
+        return False
+        
+    expected_signature = "sha256=" + hmac.new(
+        key=WEBHOOK_SECRET.encode(),
+        msg=payload,
+        digestmod=hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(signature, expected_signature)
+
+@app.post("/webhook")
+async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
+    payload_bytes = await request.body()
+    signature = request.headers.get("X-Hub-Signature-256")
+    
+    # 1. Validation (Skip if secret is missing for local testing)
+    if WEBHOOK_SECRET and not validate_signature(payload_bytes, signature):
+        raise HTTPException(status_code=403, detail="Invalid signature")
+    
+    payload = await request.json()
+    event_type = request.headers.get("X-GitHub-Event")
+
+    if event_type == "pull_request":
+        action = payload.get("action")
+        if action in ["opened", "synchronize"]:
+            print(f"Event received: PR #{payload.get('number')} {action}")
+            background_tasks.add_task(process_pr_event, payload)
+    
+    return {"status": "accepted"}
+
+@app.get("/")
+async def root():
+    return {"message": "AI Reviewer is active"}
