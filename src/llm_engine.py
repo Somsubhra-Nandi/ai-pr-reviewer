@@ -17,7 +17,7 @@ class LLMEngine:
         self.api_key = os.getenv("MY_NEW_GEMINI_KEY")
         
         if not self.api_key:
-            logger.error("❌ MY_NEW_GEMINI_KEY is missing in .env!")
+            logger.error("MY_NEW_GEMINI_KEY is missing in .env!")
         
         # 2. Configure the STABLE library
         if self.api_key:
@@ -28,7 +28,7 @@ class LLMEngine:
         self.model = genai.GenerativeModel('gemini-flash-latest')
 
     async def analyze_code(self, diff: str, persona: str, mode: str) -> AIReviewResult:
-        logger.info(f"🧠 Gemini: Analyzing {len(diff)} chars (Persona: {persona})")
+        logger.info(f"Gemini: Analyzing {len(diff)} chars (Persona: {persona})")
 
         persona_map = {
             "security": "You are a Security Engineer. Focus on OWASP, secrets, and auth.",
@@ -86,7 +86,7 @@ class LLMEngine:
             return AIReviewResult.model_validate_json(raw_text)
 
         except Exception as e:
-            logger.error(f"💥 Gemini Error: {e}")
+            logger.error(f"Gemini Error: {e}")
             return AIReviewResult(
                 summary=f"Analysis Failed: {str(e)}",
                 security_score=0,
