@@ -41,18 +41,28 @@ class MCPClient:
             pr = self.repo.get_pull(pr_number)
             
             # 2. Get the Diff URL (GitHub provides a raw text URL for changes)
-            diff_url = pr.diff_url
+            diff_url = pr.url
             
             # 3. Download the Diff Text securely
             # We use requests because PyGithub doesn't provide the raw diff text easily
             headers = {"Authorization": f"token {self.token}",
                        "Accept": "application/vnd.github.v3.diff"}
-            
-            response = requests.get(diff_url, headers=headers)
+            response = requests.get(diff_url, headers=headers, timeout=10)
             response.raise_for_status()
             
             return response.text
-
+        
+        except requests.exceptions.Timeout:
+            # Specific handling for timeouts
+            logger.error(f"Timeout while fetching PR #{pr_number}")
+            return ""
+        
+        except requests.exceptions.RequestException as e:
+            #Sanitized logging (hide sensitive URL/headers)
+            status = e.response.status_code if e.response else "Unknown"
+            logger.error(f"HTTP Error fetching diff: Status {status}")
+            return ""
+        
         except Exception as e:
             logger.error(f" Failed to fetch PR diff: {e}")
             return ""
