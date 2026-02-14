@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 import requests
 from github import Github, Auth
 from src.models.review_schema import AIReviewResult
@@ -47,7 +48,13 @@ class MCPClient:
             # We use requests because PyGithub doesn't provide the raw diff text easily
             headers = {"Authorization": f"token {self.token}",
                        "Accept": "application/vnd.github.v3.diff"}
-            response = requests.get(diff_url, headers=headers, timeout=10)
+            # Run blocking request in a separate thread
+            response = await asyncio.to_thread(
+                requests.get, 
+                diff_url, 
+                headers=headers, 
+                timeout=10
+            )
             response.raise_for_status()
             
             return response.text
