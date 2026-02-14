@@ -106,5 +106,5 @@ class MCPClient:
             return comment.html_url
 
         except Exception as e:
-            logger.error(f"❌ Failed to post comment: {e}")
+            logger.error(f"Failed to post comment: {e}")
             return "error_posting_comment"

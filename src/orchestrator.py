@@ -40,6 +40,10 @@ async def process_pr_event(payload: Dict[str, Any]):
         # 2. Fetch the PR Diff (Safe Access)
         pr_diff = await mcp.get_pr_diff(pr_number)
         
+        if not pr_diff:
+            logger.error("Diff is empty or failed to fetch. Aborting review.")
+            return
+        
         # 3. Budget Check
         if len(pr_diff) > MAX_TOKENS_ESTIMATE:
             logger.warning(f"PR #{pr_number} is too large. Switching to SUMMARY mode.")
