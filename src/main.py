@@ -40,7 +40,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
 
     if event_type == "pull_request":
         action = payload.get("action")
-        if action in ["opened", "synchronize"]:
+        if action in ["opened", "synchronize","reopened"]:
             print(f"Event received: PR #{payload.get('number')} {action}")
             background_tasks.add_task(process_pr_event, payload)
     
