@@ -75,6 +75,7 @@ GITHUB_TOKEN=ghp_your_github_token_here
 MY_NEW_GEMINI_KEY=AIza_your_gemini_key_here
 WEBHOOK_SECRET=your_local_secret
 ```
+add this `.env` file to `.gitignore`
 
 ### 3. Install Dependencies
 
