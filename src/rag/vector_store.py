@@ -2,6 +2,7 @@ import os
 from pinecone import Pinecone, ServerlessSpec
 from src.rag.embeddings import get_embedding
 from dotenv import load_dotenv
+from src.security import SecurityUtils
 
 load_dotenv()
 
@@ -15,7 +16,8 @@ class Memory:
         """
         Stores a 'lesson' in the vector database.
         """
-        vector = get_embedding(feedback_text)
+        safe_feedback = SecurityUtils.scrub_sensitive_data(feedback_text)
+        vector = get_embedding(safe_feedback)
         
         # We use the text itself as ID (hashed) or just a random one. 
         # Metadata helps us filter later.
@@ -28,7 +30,7 @@ class Memory:
                     "id": record_id,
                     "values": vector,
                     "metadata": {
-                        "text": feedback_text,
+                        "text": safe_feedback,
                         "category": category
                     }
                 }
