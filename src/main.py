@@ -23,11 +23,12 @@ def validate_signature(payload: bytes, signature: str) -> bool:
         msg=payload,
         digestmod=hashlib.sha256
     ).hexdigest()
-    
+    # Use compare_digest instead of '==' to prevent timing attacks
     return hmac.compare_digest(signature, expected_signature)
 
 @app.post("/webhook")
 async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
+    # We must read raw bytes for the HMAC signature. Parsing to JSON first alters the payload.
     payload_bytes = await request.body()
     signature = request.headers.get("X-Hub-Signature-256")
     
@@ -42,6 +43,7 @@ async def handle_webhook(request: Request, background_tasks: BackgroundTasks):
         action = payload.get("action")
         if action in ["opened", "synchronize","reopened"]:
             print(f"Event received: PR #{payload.get('number')} {action}")
+            # Offload to background task to avoid GitHub's 10-second webhook timeout
             background_tasks.add_task(process_pr_event, payload)
     
     return {"status": "accepted"}
