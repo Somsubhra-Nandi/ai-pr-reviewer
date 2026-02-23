@@ -110,7 +110,7 @@ We are actively developing **RAG (Retrieval-Augmented Generation)** capabilities
 
 * [ ] **Vector Memory (Pinecone):** Store feedback from *human* senior engineers.
 * [ ] **Contextual Learning:** If a senior dev corrects the bot, the bot remembers that preference for next time.
-* [ ] **Project-Specific Guidelines:** Upload your `CONTRIBUTING.md` so the bot enforces *your* specific style guide, not just generic PEP-8.
+* [ ] **Project-Specific Guidelines:** Open a pull request with a detailed description. We prefer not to change any existing prompt.
 
 ---
 
