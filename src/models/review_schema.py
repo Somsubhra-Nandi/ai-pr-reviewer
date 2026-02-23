@@ -7,11 +7,11 @@ class ReviewFinding(BaseModel):
     line_start: int = Field(..., description="The starting line number of the issue")
     line_end: int = Field(..., description="The ending line number of the issue")
     
-    # 🛠️ UPDATE: Changed from strict Literal[...] to str
+    # UPDATE: Changed from strict Literal[...] to str
     # This accepts ANY word the AI chooses (CRITICAL, MAJOR, HIGH, etc.)
     severity: str = Field(..., description="How urgent is this? (e.g., CRITICAL, HIGH, MEDIUM, LOW)")
     
-    # 🛠️ UPDATE: Changed from strict Literal[...] to str
+    # UPDATE: Changed from strict Literal[...] to str
     category: str = Field(..., description="The type of issue (e.g., SECURITY, BUG, STYLE)")
     
     suggestion: str = Field(..., description="Concise advice on how to fix it")
